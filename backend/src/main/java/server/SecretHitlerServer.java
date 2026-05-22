@@ -16,6 +16,9 @@ import server.util.Lobby;
 
 import java.io.*;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.*;
 
 import java.text.SimpleDateFormat;
@@ -132,6 +135,10 @@ public class SecretHitlerServer {
         serverApp.get("/check-login", SecretHitlerServer::checkLogin); // Checks if a login is valid.
         serverApp.get("/new-lobby", SecretHitlerServer::createNewLobby); // Creates and returns the code for a new lobby
         serverApp.get("/ping", SecretHitlerServer::ping);
+
+        // Umami analytics proxy (bypasses ad blockers by serving from our own domain)
+        serverApp.get("/umami/script.js", SecretHitlerServer::proxyUmamiScript);
+        serverApp.post("/umami/api/send", SecretHitlerServer::proxyUmamiSend);
 
         serverApp.ws("/game", wsHandler -> {
             wsHandler.onConnect(SecretHitlerServer::onWebsocketConnect);
@@ -365,6 +372,57 @@ public class SecretHitlerServer {
     public static void ping(Context ctx) {
         ctx.status(200);
         ctx.result("OK");
+    }
+
+    /**
+     * Proxies the Umami analytics script from cloud.umami.is.
+     * This allows the script to be served from our own domain, bypassing ad blockers.
+     */
+    public static void proxyUmamiScript(Context ctx) {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://cloud.umami.is/script.js"))
+                    .GET()
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            ctx.status(response.statusCode());
+            ctx.contentType("application/javascript");
+            ctx.result(response.body());
+        } catch (Exception e) {
+            logger.error("Failed to proxy Umami script.", e);
+            ctx.status(500);
+        }
+    }
+
+    /**
+     * Proxies analytics event data to the Umami Cloud API.
+     * This allows tracking data to be sent through our own domain, bypassing ad blockers.
+     */
+    public static void proxyUmamiSend(Context ctx) {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                    .uri(URI.create("https://cloud.umami.is/api/send"))
+                    .header("Content-Type", "application/json");
+
+            // Forward relevant headers
+            String userAgent = ctx.header("User-Agent");
+            if (userAgent != null) requestBuilder.header("User-Agent", userAgent);
+            String referer = ctx.header("Referer");
+            if (referer != null) requestBuilder.header("Referer", referer);
+
+            HttpRequest request = requestBuilder
+                    .POST(HttpRequest.BodyPublishers.ofString(ctx.body()))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            ctx.status(response.statusCode());
+            ctx.result(response.body());
+        } catch (Exception e) {
+            logger.error("Failed to proxy Umami send.", e);
+            ctx.status(500);
+        }
     }
 
     /**
