@@ -48,7 +48,7 @@ class LoginPageContent extends Component {
                             <br />
                             Dự án mã nguồn mở, được cấp phép theo CC BY-NC-SA 4.0.
                             Bạn có thể đọc thêm về dự án <a
-                                href={"https://github.com/ShrimpCryptid/Secret-Hitler-Online/"}
+                                href={"https://github.com/kirito9123/Secret-Hitler-Online-development/"}
                                 rel="noreferrer"
                                 target={"_blank"} onClick={this.onClickAbout}>
                                 trên GitHub
@@ -58,9 +58,9 @@ class LoginPageContent extends Component {
                                 Secret Hitler
                             </a> của Goat, Wolf &amp; Cabbage (© 2016-2020). Phát triển bởi ShrimpCryptid (© 2020-2023).
                             <br /><br />
-                            Tìm thấy lỗi hoặc muốn bình luận? Báo cáo lỗi trên <a href={"https://github.com/ShrimpCryptid/Secret-Hitler-Online/issues"}
+                            Tìm thấy lỗi hoặc muốn bình luận? Báo cáo lỗi trên <a href={"https://github.com/kirito9123/Secret-Hitler-Online-development/issues"}
                                 rel="noreferrer"
-                                target={"_blank"}>trang Issues</a> hoặc người việt hóa email: <a href="mailto:tringuyen9123@gmail.com">tringuyen9123@gmail.com</a>.
+                                target={"_blank"}>trang Issues</a> hoặc email người việt hóa : <a href="mailto:tringuyen9123@gmail.com">tringuyen9123@gmail.com</a>.
                         </p>
                         <br />
                     </div>
