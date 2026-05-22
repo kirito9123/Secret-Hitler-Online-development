@@ -1,0 +1,78 @@
+.rules-panel {
+  width: 250px;
+  background-color: var(--backgroundDark);
+  border: 2px solid var(--headerFill);
+  border-radius: 8px;
+  padding: 15px;
+  color: var(--textColorOnDark);
+  font-family: var(--textFont);
+  text-align: left;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  height: fit-content;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.rules-header {
+  color: var(--headerFill);
+  font-family: var(--headerFont);
+  text-align: center;
+  border-bottom: 1px solid var(--headerFill);
+  padding-bottom: 10px;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.rules-content h4 {
+  color: var(--textColorHighlight);
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+.rules-content p, .rules-content ul, .rules-content ol {
+  font-size: 0.9rem;
+  margin-top: 0;
+  line-height: 1.4;
+}
+
+.rules-content li {
+  margin-bottom: 8px;
+}
+
+.text-liberal {
+  color: var(--textColorLiberal);
+  font-weight: bold;
+}
+
+.text-fascist {
+  color: var(--textColorFascist);
+  font-weight: bold;
+}
+
+.rules-divider {
+  border-color: var(--textColorOnDark);
+  opacity: 0.2;
+  margin: 15px 0;
+}
+
+/* Scrollbar styling for webkit */
+.rules-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rules-panel::-webkit-scrollbar-track {
+  background: var(--backgroundLight);
+  border-radius: 4px;
+}
+
+.rules-panel::-webkit-scrollbar-thumb {
+  background: var(--headerFill);
+  border-radius: 4px;
+}
+
+/* Hide rules on smaller screens where they'd squash the board */
+@media (max-width: 1200px) {
+  .rules-panel {
+    display: none;
+  }
+}

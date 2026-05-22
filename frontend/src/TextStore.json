@@ -1,0 +1,21 @@
+{
+    "alert": {
+        "roles": {
+            "hitler": {
+                "1": "Bạn thắng nếu được bầu thành công làm thủ tướng sau khi 3 chính sách Phát Xít đã được thông qua, hoặc nếu bảng chính sách đầy chính sách Phát Xít.",
+                "2": "Bạn thua nếu bảng chính sách đầy chính sách Tự Do hoặc nếu bạn bị hành quyết.",
+                "3": "Hãy cố gắng tạo sự tin tưởng và dựa vào các đồng minh Phát Xít để tạo cơ hội cho bạn."
+            },
+            "fascist": {
+                "1": "Bạn thắng nếu Hitler được bầu thành công làm thủ tướng sau khi 3 chính sách Phát Xít đã được thông qua, hoặc nếu bảng chính sách đầy chính sách Phát Xít.",
+                "2": "Bạn thua nếu bảng chính sách đầy chính sách Tự Do hoặc nếu Hitler bị hành quyết.",
+                "3": "Giữ sự nghi ngờ khỏi Hitler và tìm cách gieo rắc nhầm lẫn vào trò chơi."
+            },
+            "liberal": {
+                "1": "Bạn thắng nếu bảng chính sách đầy chính sách Tự Do, hoặc nếu Hitler bị hành quyết.",
+                "2": "Bạn thua nếu bảng chính sách đầy chính sách Phát Xít, hoặc nếu Hitler được bầu làm thủ tướng sau khi 3 chính sách Phát Xít được thông qua.",
+                "3": "Hãy để ý và tìm kiếm các hành động đáng ngờ. Tìm ra Hitler và nhớ rằng bất kỳ ai cũng có thể đang nói dối!"
+            }
+        }
+    }
+}
