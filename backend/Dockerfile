@@ -1,8 +1,15 @@
+# Stage 1: Build the application using Gradle
+FROM gradle:7.6.1-jdk17 AS build
+WORKDIR /app
+COPY . .
+RUN gradle clean jar --no-daemon
+
+# Stage 2: Run the application
 FROM ibm-semeru-runtimes:open-17-jre-focal
+WORKDIR /app
+COPY --from=build /app/build/libs/*.jar app.jar
 
 ENV PORT 8080
 EXPOSE 8080
 
-ADD target/secret-hitler-online.jar /secret-hitler-online.jar
-
-CMD java -jar /secret-hitler-online.jar
+CMD java -jar app.jar
