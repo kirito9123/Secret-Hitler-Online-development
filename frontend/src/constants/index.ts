@@ -31,7 +31,7 @@ export const SERVER_PING = "/ping";
 export const MAX_FAILED_CONNECTIONS = 5;
 export const LOBBY_CODE_LENGTH = 4;
 export const SERVER_TIMEOUT = 4000;
-export const PING_INTERVAL = 50000;
+export const PING_INTERVAL = 15000; // Ping every 15s to prevent WebSocket timeout on Render.com
 
 //////// Game Constants
 export const MIN_PLAYERS = 5;
