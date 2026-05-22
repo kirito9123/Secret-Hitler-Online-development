@@ -123,15 +123,9 @@ public class SecretHitlerServer {
         // Only initialize Javalin communication after the database has been queried.
         Javalin serverApp = Javalin.create(config -> {
             config.plugins.enableCors(cors -> {
-                if (ApplicationConfig.DEBUG) {
-                    cors.add(it -> {
-                        it.anyHost();
-                    });
-                } else {
-                    cors.add(it -> {
-                        it.allowHost("https://secret-hitler.online");
-                    });
-                }
+                cors.add(it -> {
+                    it.anyHost();
+                });
             });
         }).start(getHerokuAssignedPort());
 
