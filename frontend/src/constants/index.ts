@@ -14,11 +14,11 @@ export const DEBUG = process.env.REACT_APP_DEBUG !== undefined;
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname.startsWith('192.168.') || window.location.hostname.startsWith('26.');
 export const SERVER_ADDRESS = isLocalhost 
   ? window.location.hostname + ':4040' 
-  : process.env.REACT_APP_SERVER_ADDRESS || "secret-hitler-online.fly.dev";
+  : process.env.REACT_APP_SERVER_ADDRESS || "secret-hitler-backend-uvwh.onrender.com";
 
 export const SERVER_ADDRESS_HTTP = isLocalhost 
   ? "http://" + SERVER_ADDRESS 
-  : process.env.REACT_APP_SERVER_ADDRESS_HTTP || "https://" + SERVER_ADDRESS;
+  : process.env.REACT_APP_SERVER_ADDRESS_HTTP || "https://secret-hitler-backend-uvwh.onrender.com";
 
 export const WEBSOCKET_HEADER = isLocalhost 
   ? "ws://" 
