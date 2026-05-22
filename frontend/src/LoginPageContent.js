@@ -60,7 +60,7 @@ class LoginPageContent extends Component {
                             <br /><br />
                             Tìm thấy lỗi hoặc muốn bình luận? Báo cáo lỗi trên <a href={"https://github.com/ShrimpCryptid/Secret-Hitler-Online/issues"}
                                 rel="noreferrer"
-                                target={"_blank"}>trang Issues</a>.
+                                target={"_blank"}>trang Issues</a> hoặc người việt hóa email: <a href="mailto:tringuyen9123@gmail.com">tringuyen9123@gmail.com</a>.
                         </p>
                         <br />
                     </div>
