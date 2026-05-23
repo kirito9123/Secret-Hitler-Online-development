@@ -39,6 +39,18 @@ class LoginPageContent extends Component {
                             buổi game tối.<br /><br />Chơi miễn phí ngay trên trình duyệt, không có quảng cáo!
                             <br /><br />
                         </p>
+                        {/* Nút tải luật chơi */}
+                        <div id={"rules-download-container"}>
+                            <p id={"rules-download-label"}>📖 Chưa biết cách chơi?</p>
+                            <a
+                                id={"rules-download-btn"}
+                                href={"/Luat_choi_Secret_Hitler_Tieng_Viet.docx"}
+                                download={"Luat_choi_Secret_Hitler_Tieng_Viet.docx"}
+                                onClick={() => ReactGA.event({ category: "Download Rules", action: "User downloaded rules file." })}
+                            >
+                                ⬇ Tải Luật Chơi (.docx)
+                            </a>
+                        </div>
                     </div>
                     <div id={"login-page-gif-container"}>
                         {items}
@@ -62,19 +74,6 @@ class LoginPageContent extends Component {
                                 rel="noreferrer"
                                 target={"_blank"}>trang Issues</a> hoặc email người việt hóa : <a href="mailto:tringuyen9123@gmail.com">tringuyen9123@gmail.com</a>.
                         </p>
-
-                        {/* Nút tải luật chơi */}
-                        <div id={"rules-download-container"}>
-                            <p id={"rules-download-label"}>📖 Chưa biết cách chơi?</p>
-                            <a
-                                id={"rules-download-btn"}
-                                href={"/Luat_choi_Secret_Hitler_Tieng_Viet.docx"}
-                                download={"Luat_choi_Secret_Hitler_Tieng_Viet.docx"}
-                                onClick={() => ReactGA.event({ category: "Download Rules", action: "User downloaded rules file." })}
-                            >
-                                ⬇ Tải Luật Chơi (.docx)
-                            </a>
-                        </div>
                         <br />
                     </div>
 
