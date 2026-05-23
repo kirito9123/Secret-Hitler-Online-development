@@ -68,11 +68,14 @@ class LoginPageContent extends Component {
                             <br /><br />
                             Được chuyển thể từ trò chơi bài gốc <a href={"https://secrethitler.com"} target={"_blank"} rel="noreferrer" onClick={this.onClickGameWebsite}>
                                 Secret Hitler
-                            </a> của Goat, Wolf &amp; Cabbage (© 2016-2020). Phát triển bởi ShrimpCryptid (© 2020-2023).
+                            </a> của Goat, Wolf &amp; Cabbage (© 2016-2020).
+                            <br /><br />
+                            Phát triển bởi <a href={"https://github.com/ShrimpCryptid/Secret-Hitler-Online/"} target={"_blank"} rel="noreferrer">ShrimpCryptid</a> (© 2020-2023).<br />
+                            Việt hóa bởi <a href={"https://github.com/kirito9123/Secret-Hitler-Online-development"} target={"_blank"} rel="noreferrer">Nguyễn Minh Trí</a>.
                             <br /><br />
                             Tìm thấy lỗi hoặc muốn bình luận? Báo cáo lỗi trên <a href={"https://github.com/kirito9123/Secret-Hitler-Online-development/issues"}
                                 rel="noreferrer"
-                                target={"_blank"}>trang Issues</a> hoặc email người việt hóa : <a href="mailto:tringuyen9123@gmail.com">tringuyen9123@gmail.com</a>.
+                                target={"_blank"}>trang Issues</a> hoặc email: <a href="mailto:tringuyen9123@gmail.com">tringuyen9123@gmail.com</a>.
                         </p>
                         <br />
                     </div>
