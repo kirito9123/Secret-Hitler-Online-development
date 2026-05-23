@@ -54,3 +54,41 @@
     align-items: center;
     display: inline-block;
 }
+
+/* === Nút tải luật chơi === */
+#rules-download-container {
+    text-align: center;
+    margin: 12px 0 8px 0;
+}
+
+#rules-download-label {
+    font-family: 'Montserrat', sans-serif;
+    color: #bbbbbb;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+#rules-download-btn {
+    display: inline-block;
+    padding: 10px 24px;
+    background-color: var(--buttonFill);
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border-radius: 6px;
+    border-bottom: 3px solid var(--buttonShadowFill);
+    transition: background-color 0.15s ease, transform 0.1s ease;
+    letter-spacing: 0.5px;
+}
+
+#rules-download-btn:hover {
+    background-color: var(--buttonHoverFill);
+    transform: translateY(-2px);
+}
+
+#rules-download-btn:active {
+    transform: translateY(1px);
+    border-bottom-width: 1px;
+}
