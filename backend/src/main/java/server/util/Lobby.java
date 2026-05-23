@@ -111,10 +111,12 @@ public class Lobby implements Serializable {
     synchronized public void sendToUser(String username, String message) {
         for (Map.Entry<WsContext, String> entry : userToUsername.entrySet()) {
             if (entry.getValue().equals(username)) {
-                try {
-                    entry.getKey().send(message);
-                } catch (Exception e) {
-                    logger.warn("Failed to relay WebRTC message to user '" + username + "'.", e);
+                if (entry.getKey().session.isOpen()) {
+                    try {
+                        entry.getKey().send(message);
+                    } catch (Exception e) {
+                        logger.warn("Failed to relay WebRTC message to user '" + username + "'.", e);
+                    }
                 }
                 return;
             }
@@ -131,10 +133,12 @@ public class Lobby implements Serializable {
     synchronized public void sendToAllExcept(String excludeName, String message) {
         for (Map.Entry<WsContext, String> entry : userToUsername.entrySet()) {
             if (!entry.getValue().equals(excludeName)) {
-                try {
-                    entry.getKey().send(message);
-                } catch (Exception e) {
-                    logger.warn("Failed to relay WebRTC message to user '" + entry.getValue() + "'.", e);
+                if (entry.getKey().session.isOpen()) {
+                    try {
+                        entry.getKey().send(message);
+                    } catch (Exception e) {
+                        logger.warn("Failed to relay WebRTC message to user '" + entry.getValue() + "'.", e);
+                    }
                 }
             }
         }
@@ -452,7 +456,13 @@ public class Lobby implements Serializable {
         JSONObject icons = new JSONObject(usernameToIcon);
         message.put("icon", icons);
 
-        ctx.send(message.toString());
+        if (ctx.session.isOpen()) {
+            try {
+                ctx.send(message.toString());
+            } catch (Exception e) {
+                logger.warn("Failed to update user " + userName, e);
+            }
+        }
     }
 
     /**
