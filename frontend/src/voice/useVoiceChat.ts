@@ -32,8 +32,12 @@ export interface VoiceChatState {
   mode: MicMode;
   /** List of available microphone devices */
   micDevices: MediaDeviceInfo[];
-  /** Currently selected device ID */
+  /** Currently selected mic ID */
   selectedMicId: string;
+  /** List of available speaker/output devices */
+  speakerDevices: MediaDeviceInfo[];
+  /** Currently selected speaker ID */
+  selectedSpeakerId: string;
   /** Are we currently transmitting (either open-mic or PTT held) */
   isTalking: boolean;
   /** Which peers are speaking right now */
@@ -48,6 +52,7 @@ export interface VoiceChatControls {
   toggleMic: () => void;
   setMode: (mode: MicMode) => void;
   setMicDevice: (deviceId: string) => void;
+  setSpeakerDevice: (deviceId: string) => void;
   handlePttKeyDown: () => void;
   handlePttKeyUp: () => void;
   /** Called by App when a WebRTC signaling message arrives from the server */
@@ -96,6 +101,8 @@ export function useVoiceChat(
   const [isTalking, setIsTalking] = useState(false);
   const [micDevices, setMicDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedMicId, setSelectedMicId] = useState<string>("");
+  const [speakerDevices, setSpeakerDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedSpeakerId, setSelectedSpeakerId] = useState<string>("");
   const [speakingPeers, setSpeakingPeers] = useState<Record<string, boolean>>({});
   const [permissionDenied, setPermissionDenied] = useState(false);
 
@@ -114,19 +121,26 @@ export function useVoiceChat(
     setIsTalking(enabled);
   }, []);
 
-  /** Enumerate audio input devices */
+  /** Enumerate audio input and output devices */
   const refreshDevices = useCallback(async () => {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
+      
       const mics = devices.filter((d) => d.kind === "audioinput");
       setMicDevices(mics);
       if (mics.length > 0 && !selectedMicId) {
         setSelectedMicId(mics[0].deviceId);
       }
+
+      const speakers = devices.filter((d) => d.kind === "audiooutput");
+      setSpeakerDevices(speakers);
+      if (speakers.length > 0 && !selectedSpeakerId) {
+        setSelectedSpeakerId(speakers[0].deviceId);
+      }
     } catch {
       // ignore
     }
-  }, [selectedMicId]);
+  }, [selectedMicId, selectedSpeakerId]);
 
   /** Start speaking-detection poll */
   const startSpeakingPoll = useCallback(() => {
@@ -209,9 +223,14 @@ export function useVoiceChat(
         if (!audio) {
           audio = new Audio();
           audio.autoplay = true;
+          // Apply speaker device if supported and selected
+          if (selectedSpeakerId && typeof (audio as any).setSinkId === "function") {
+            (audio as any).setSinkId(selectedSpeakerId).catch(() => {});
+          }
           audioElemsRef.current.set(peerName, audio);
         }
         audio.srcObject = remoteStream;
+        audio.play().catch(() => {}); // Force play to bypass some autoplay policies if possible
 
         // Set up analyser for speaking detection
         if (!audioContextRef.current) {
@@ -483,6 +502,23 @@ export function useVoiceChat(
     [isEnabled, acquireLocalStream, mode, isMicActive]
   );
 
+  // ─── Speaker device change ────────────────────────────────────────────────────
+
+  const setSpeakerDevice = useCallback(
+    (deviceId: string) => {
+      setSelectedSpeakerId(deviceId);
+      // Update all existing audio elements
+      audioElemsRef.current.forEach((audio) => {
+        if (typeof (audio as any).setSinkId === "function") {
+          (audio as any).setSinkId(deviceId).catch((err: any) => {
+            console.warn("Error setting sink ID:", err);
+          });
+        }
+      });
+    },
+    []
+  );
+
   // ─── Cleanup on unmount ───────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -510,6 +546,8 @@ export function useVoiceChat(
     mode,
     micDevices,
     selectedMicId,
+    speakerDevices,
+    selectedSpeakerId,
     isTalking,
     speakingPeers,
     permissionDenied,
@@ -521,6 +559,7 @@ export function useVoiceChat(
     toggleMic,
     setMode,
     setMicDevice,
+    setSpeakerDevice,
     handlePttKeyDown,
     handlePttKeyUp,
     handleSignalingMessage,

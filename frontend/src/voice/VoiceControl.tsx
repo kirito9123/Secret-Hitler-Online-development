@@ -29,6 +29,8 @@ const VoiceControl: React.FC<VoiceControlProps> = ({ state, controls, peers }) =
     mode,
     micDevices,
     selectedMicId,
+    speakerDevices,
+    selectedSpeakerId,
     isTalking,
     speakingPeers,
     permissionDenied,
@@ -38,6 +40,7 @@ const VoiceControl: React.FC<VoiceControlProps> = ({ state, controls, peers }) =
     toggleMic,
     setMode,
     setMicDevice,
+    setSpeakerDevice,
   } = controls;
 
   // ─── Derived labels ──────────────────────────────────────────────────────────
@@ -155,7 +158,7 @@ const VoiceControl: React.FC<VoiceControlProps> = ({ state, controls, peers }) =
         </p>
       )}
 
-      {/* Device selector */}
+      {/* Mic selector */}
       {micDevices.length > 0 && (
         <div className="voice-device-row">
           <span className="voice-device-icon">🎤</span>
@@ -163,12 +166,32 @@ const VoiceControl: React.FC<VoiceControlProps> = ({ state, controls, peers }) =
             className="voice-device-select"
             value={selectedMicId}
             onChange={(e) => setMicDevice(e.target.value)}
-            id="voice-device-select"
+            id="voice-mic-select"
             aria-label="Chọn thiết bị microphone"
           >
             {micDevices.map((d) => (
               <option key={d.deviceId} value={d.deviceId}>
                 {d.label || `Mic ${d.deviceId.slice(0, 6)}`}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Speaker selector */}
+      {speakerDevices.length > 0 && (
+        <div className="voice-device-row">
+          <span className="voice-device-icon">🎧</span>
+          <select
+            className="voice-device-select"
+            value={selectedSpeakerId}
+            onChange={(e) => setSpeakerDevice(e.target.value)}
+            id="voice-speaker-select"
+            aria-label="Chọn thiết bị đầu ra âm thanh"
+          >
+            {speakerDevices.map((d) => (
+              <option key={d.deviceId} value={d.deviceId}>
+                {d.label || `Speaker ${d.deviceId.slice(0, 6)}`}
               </option>
             ))}
           </select>
