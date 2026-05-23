@@ -77,6 +77,14 @@ public class SecretHitlerServer {
 
     public static final String COMMAND_END_TERM = "end-term";
 
+    // WebRTC signaling commands for voice chat
+    public static final String COMMAND_WEBRTC_OFFER = "webrtc-offer";
+    public static final String COMMAND_WEBRTC_ANSWER = "webrtc-answer";
+    public static final String COMMAND_WEBRTC_ICE = "webrtc-ice";
+    public static final String COMMAND_WEBRTC_LEAVE = "webrtc-leave";
+    public static final String PARAM_WEBRTC_TARGET = "target";
+    public static final String PARAM_WEBRTC_PAYLOAD = "payload";
+
     private static final String CODE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTWXYZ"; // u,v characters can look ambiguous
     private static final int CODE_LENGTH = 4;
 
@@ -135,6 +143,7 @@ public class SecretHitlerServer {
         serverApp.get("/check-login", SecretHitlerServer::checkLogin); // Checks if a login is valid.
         serverApp.get("/new-lobby", SecretHitlerServer::createNewLobby); // Creates and returns the code for a new lobby
         serverApp.get("/ping", SecretHitlerServer::ping);
+        serverApp.get("/lobbies", SecretHitlerServer::getLobbyList); // Returns the list of active lobbies
 
         // Umami analytics proxy (bypasses ad blockers by serving from our own domain)
         serverApp.get("/umami/script.js", SecretHitlerServer::proxyUmamiScript);
@@ -372,6 +381,33 @@ public class SecretHitlerServer {
     public static void ping(Context ctx) {
         ctx.status(200);
         ctx.result("OK");
+    }
+
+    /**
+     * Returns a JSON array of all active lobbies (those with at least one connected player).
+     * Each entry includes: code, playerCount, maxPlayers, status ("waiting" or "playing").
+     *
+     * @param ctx the HTTP get request context.
+     */
+    public static void getLobbyList(Context ctx) {
+        org.json.JSONArray lobbiesArray = new org.json.JSONArray();
+        synchronized (codeToLobby) {
+            for (Map.Entry<String, Lobby> entry : codeToLobby.entrySet()) {
+                Lobby lobby = entry.getValue();
+                int playerCount = lobby.getUserCount();
+                if (playerCount > 0) { // Only include lobbies that have players
+                    JSONObject lobbyInfo = new JSONObject();
+                    lobbyInfo.put("code", entry.getKey());
+                    lobbyInfo.put("playerCount", playerCount);
+                    lobbyInfo.put("maxPlayers", 10);
+                    lobbyInfo.put("status", lobby.isInGame() ? "playing" : "waiting");
+                    lobbiesArray.put(lobbyInfo);
+                }
+            }
+        }
+        ctx.status(200);
+        ctx.contentType("application/json");
+        ctx.result(lobbiesArray.toString());
     }
 
     /**
@@ -761,6 +797,34 @@ public class SecretHitlerServer {
                             lobby.setBotsEnabled(botsEnabled);
                         }
                         break;
+
+                    // ---- WebRTC Voice Chat Signaling ----
+                    // These commands relay signaling messages between peers within the same lobby.
+                    // The server acts as a simple relay (signaling server) – no media processing.
+                    case COMMAND_WEBRTC_OFFER:
+                    case COMMAND_WEBRTC_ANSWER:
+                    case COMMAND_WEBRTC_ICE:
+                    case COMMAND_WEBRTC_LEAVE: {
+                        String targetName = message.optString(PARAM_WEBRTC_TARGET, null);
+                        if (targetName != null) {
+                            // Relay to a specific peer
+                            JSONObject relay = new JSONObject();
+                            relay.put(PARAM_PACKET_TYPE, message.getString(PARAM_COMMAND));
+                            relay.put("from", name);
+                            relay.put(PARAM_WEBRTC_PAYLOAD, message.opt(PARAM_WEBRTC_PAYLOAD));
+                            lobby.sendToUser(targetName, relay.toString());
+                        } else {
+                            // Broadcast to all in lobby (e.g., webrtc-leave)
+                            JSONObject relay = new JSONObject();
+                            relay.put(PARAM_PACKET_TYPE, message.getString(PARAM_COMMAND));
+                            relay.put("from", name);
+                            relay.put(PARAM_WEBRTC_PAYLOAD, message.opt(PARAM_WEBRTC_PAYLOAD));
+                            lobby.sendToAllExcept(name, relay.toString());
+                        }
+                        sendOKMessage = false;
+                        updateUsers = false;
+                        break;
+                    }
 
                     default: // This is an invalid command.
                         throw new RuntimeException("unrecognized command " + message.get(PARAM_COMMAND));

@@ -1,0 +1,253 @@
+/* ===== Lobby List Container ===== */
+.lobby-list-section {
+  margin: 24px 0;
+  width: 100%;
+}
+
+.lobby-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 12px;
+}
+
+.lobby-list-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--textColor, #e0e0e0);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lobby-list-title::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.7); }
+}
+
+.lobby-list-refresh-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.55);
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.04em;
+}
+
+.lobby-list-refresh-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.85);
+  border-color: rgba(255,255,255,0.3);
+}
+
+.lobby-list-refresh-btn.spinning {
+  animation: spin 0.7s linear;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ===== Grid ===== */
+.lobby-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+/* ===== Room Card ===== */
+.lobby-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  backdrop-filter: blur(8px);
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+}
+
+.lobby-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  transition: opacity 0.22s ease;
+  opacity: 0;
+}
+
+.lobby-card:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+}
+
+.lobby-card:hover::before {
+  opacity: 1;
+}
+
+.lobby-card.playing {
+  border-color: rgba(251, 146, 60, 0.3);
+}
+
+.lobby-card.playing:hover {
+  border-color: rgba(251, 146, 60, 0.55);
+}
+
+/* ===== Card Content ===== */
+.lobby-card-code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #e2e2e2;
+  letter-spacing: 0.18em;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.lobby-card-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.lobby-card-players {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.55);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.lobby-card-players-icon {
+  font-size: 0.9rem;
+}
+
+/* ===== Status Badge ===== */
+.lobby-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.lobby-status-badge.waiting {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.lobby-status-badge.playing {
+  background: rgba(251, 146, 60, 0.15);
+  color: #fb923c;
+  border: 1px solid rgba(251, 146, 60, 0.3);
+}
+
+.lobby-status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ===== Empty / Loading States ===== */
+.lobby-list-empty {
+  text-align: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.88rem;
+  padding: 20px 0;
+  letter-spacing: 0.04em;
+}
+
+.lobby-list-skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.skeleton-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 16px 18px;
+  height: 82px;
+  overflow: hidden;
+  position: relative;
+}
+
+.skeleton-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.06) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
+}
+
+/* ===== Click hint ===== */
+.lobby-card-hint {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.3);
+  margin-top: 8px;
+}
+
+/* ===== Player bar ===== */
+.lobby-card-player-bar {
+  width: 100%;
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.lobby-card-player-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #4ade80, #22d3ee);
+  transition: width 0.4s ease;
+}
+
+.lobby-card.playing .lobby-card-player-bar-fill {
+  background: linear-gradient(90deg, #fb923c, #f43f5e);
+}

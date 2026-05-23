@@ -1,0 +1,295 @@
+/* ========================================================== */
+/* Voice Control Bar                                          */
+/* ========================================================== */
+
+/* Floating bar */
+.voice-control-bar {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* Main control panel */
+.voice-panel {
+  background: rgba(18, 18, 28, 0.88);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  padding: 14px 18px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+  min-width: 240px;
+  transition: all 0.25s ease;
+}
+
+.voice-panel.disabled {
+  opacity: 0.8;
+}
+
+/* ─── Header row ─── */
+.voice-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.voice-panel-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ─── Big mic button ─── */
+.voice-mic-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.7);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.voice-mic-btn:hover {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.3);
+}
+
+.voice-mic-btn.active {
+  background: rgba(74, 222, 128, 0.18);
+  border-color: rgba(74, 222, 128, 0.6);
+  color: #4ade80;
+  box-shadow: 0 0 16px rgba(74, 222, 128, 0.25);
+}
+
+.voice-mic-btn.talking {
+  background: rgba(74, 222, 128, 0.3);
+  border-color: #4ade80;
+  color: #4ade80;
+  box-shadow: 0 0 24px rgba(74, 222, 128, 0.45);
+  animation: mic-pulse 0.8s ease-in-out infinite;
+}
+
+.voice-mic-btn.muted {
+  background: rgba(248, 113, 113, 0.15);
+  border-color: rgba(248, 113, 113, 0.4);
+  color: #f87171;
+}
+
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 24px rgba(74, 222, 128, 0.45); }
+  50%       { box-shadow: 0 0 36px rgba(74, 222, 128, 0.7); }
+}
+
+/* ─── Main row ─── */
+.voice-main-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.voice-status-text {
+  flex: 1;
+}
+
+.voice-status-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.2;
+}
+
+.voice-status-sublabel {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+}
+
+/* ─── Mode toggle ─── */
+.voice-mode-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.voice-mode-btn {
+  flex: 1;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.45);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.voice-mode-btn.selected {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.9);
+}
+
+/* ─── Device selector ─── */
+.voice-device-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.voice-device-icon {
+  font-size: 0.9rem;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.voice-device-select {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.75);
+  font-size: 0.72rem;
+  padding: 5px 8px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  transition: border-color 0.18s;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.voice-device-select:hover {
+  border-color: rgba(255,255,255,0.25);
+}
+
+.voice-device-select:focus {
+  border-color: rgba(74,222,128,0.5);
+}
+
+/* ─── Permission denied ─── */
+.voice-permission-denied {
+  font-size: 0.72rem;
+  color: #f87171;
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* ─── Toggle button (collapsed bar) ─── */
+.voice-toggle-btn {
+  background: rgba(18, 18, 28, 0.88);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.65);
+  cursor: pointer;
+  backdrop-filter: blur(16px);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.voice-toggle-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.9);
+}
+
+.voice-toggle-btn.enabled {
+  border-color: rgba(74,222,128,0.4);
+  color: #4ade80;
+}
+
+.voice-toggle-btn.talking {
+  border-color: #4ade80;
+  box-shadow: 0 0 16px rgba(74,222,128,0.4);
+  animation: mic-pulse 0.8s ease-in-out infinite;
+}
+
+/* ─── PTT hint ─── */
+.voice-ptt-hint {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.3);
+  text-align: center;
+  margin-top: 6px;
+  letter-spacing: 0.04em;
+}
+
+.voice-ptt-hint kbd {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.55);
+}
+
+/* ─── Peers list (speaking indicators) ─── */
+.voice-peers-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.voice-peer-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: all 0.2s;
+}
+
+.voice-peer-chip.speaking {
+  color: #4ade80;
+  background: rgba(74,222,128,0.1);
+  border-color: rgba(74,222,128,0.3);
+  box-shadow: 0 0 8px rgba(74,222,128,0.2);
+}
+
+.voice-peer-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.voice-peer-chip.speaking .voice-peer-dot {
+  animation: mic-pulse 0.5s ease-in-out infinite;
+}

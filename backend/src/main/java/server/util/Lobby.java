@@ -102,6 +102,45 @@ public class Lobby implements Serializable {
     }
 
     /**
+     * Sends a raw message string to the user with the given username.
+     * Used for WebRTC signaling relay.
+     *
+     * @param username the target username.
+     * @param message  the JSON message string to send.
+     */
+    synchronized public void sendToUser(String username, String message) {
+        for (Map.Entry<WsContext, String> entry : userToUsername.entrySet()) {
+            if (entry.getValue().equals(username)) {
+                try {
+                    entry.getKey().send(message);
+                } catch (Exception e) {
+                    logger.warn("Failed to relay WebRTC message to user '" + username + "'.", e);
+                }
+                return;
+            }
+        }
+    }
+
+    /**
+     * Sends a raw message string to all connected users EXCEPT the one with the given username.
+     * Used for WebRTC signaling broadcast (e.g., webrtc-leave).
+     *
+     * @param excludeName the username to skip.
+     * @param message     the JSON message string to send.
+     */
+    synchronized public void sendToAllExcept(String excludeName, String message) {
+        for (Map.Entry<WsContext, String> entry : userToUsername.entrySet()) {
+            if (!entry.getValue().equals(excludeName)) {
+                try {
+                    entry.getKey().send(message);
+                } catch (Exception e) {
+                    logger.warn("Failed to relay WebRTC message to user '" + entry.getValue() + "'.", e);
+                }
+            }
+        }
+    }
+
+    /**
      * Returns the list of usernames currently in the lobby or game. Includes
      * bot names if the game is running and has bots.
      */

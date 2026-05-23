@@ -96,6 +96,27 @@ import {
   WSCommandType,
 } from "./types";
 
+// ─── New Feature Imports ───────────────────────────────────────────────────────
+import LobbyList from "./lobby-list/LobbyList";
+import VoiceControl from "./voice/VoiceControl";
+import { useVoiceChat, VoiceChatState, VoiceChatControls } from "./voice/useVoiceChat";
+
+// ─── VoiceChat wrapper for class component ────────────────────────────────────
+// Since useVoiceChat is a hook, we use a functional wrapper that exposes state
+// and controls via callback refs passed in by the App class.
+interface VoiceWrapperProps {
+  onReady: (state: VoiceChatState, controls: VoiceChatControls) => void;
+  sendSignal: (command: string, targetName: string | null, payload: any) => void;
+  myName: string;
+  peers: string[];
+}
+const VoiceWrapper: React.FC<VoiceWrapperProps> = ({ onReady, sendSignal, myName, peers }) => {
+  const [state, controls] = useVoiceChat(sendSignal, myName);
+  // Expose to parent class every render
+  React.useEffect(() => { onReady(state, controls); });
+  return <VoiceControl state={state} controls={controls} peers={peers} />;
+};
+
 const EVENT_BAR_FADE_OUT_DURATION = 500;
 const CUSTOM_ALERT_FADE_DURATION = 1000;
 
@@ -167,6 +188,8 @@ type AppState = {
   allAnimationsFinished: boolean;
   botsEnabled: boolean;
   targetLobbySize: number;
+  /** Voice chat state snapshot (updated each render via VoiceWrapper) */
+  voiceState: VoiceChatState | null;
 };
 
 const defaultAppState: AppState = {
@@ -198,6 +221,7 @@ const defaultAppState: AppState = {
   allAnimationsFinished: true,
   botsEnabled: true,
   targetLobbySize: 5,
+  voiceState: null,
 };
 
 class App extends Component<{}, AppState> {
@@ -210,6 +234,10 @@ class App extends Component<{}, AppState> {
   okMessageListeners: (() => void)[] = [];
   allAnimationsFinished: boolean = true;
   gameOver: boolean = false;
+  // Voice chat controls ref (populated by VoiceWrapper via onReady callback)
+  voiceControls: VoiceChatControls | null = null;
+  // Previous player list for detecting joins/leaves (for voice)
+  prevUsernames: string[] = [];
 
   // noinspection DuplicatedCode
   constructor(props: any) {
@@ -246,10 +274,30 @@ class App extends Component<{}, AppState> {
     this.showChangeIconAlert = this.showChangeIconAlert.bind(this);
     this.updateChangeIconAlert = this.updateChangeIconAlert.bind(this);
     this.onClickChangeIcon = this.onClickChangeIcon.bind(this);
+    this.sendVoiceSignal = this.sendVoiceSignal.bind(this);
 
     // Ping the server to wake it up if it's not currently being used
     // This reduces the delay users experience when starting lobbies
     fetch(SERVER_ADDRESS_HTTP + SERVER_PING);
+  }
+
+  /**
+   * Sends a WebRTC signaling message to a specific peer (or broadcasts if targetName is null).
+   * Wraps the existing WebSocket sendWSCommand mechanism.
+   */
+  sendVoiceSignal(command: string, targetName: string | null, payload: any) {
+    const data: any = {
+      command,
+      name: this.state.name,
+      lobby: this.state.lobby,
+      payload,
+    };
+    if (targetName !== null) {
+      data.target = targetName;
+    }
+    if (this.websocket !== undefined) {
+      this.websocket.send(JSON.stringify(data));
+    }
   }
 
   /////////// Server Communication
@@ -430,19 +478,39 @@ class App extends Component<{}, AppState> {
       console.log(message);
     }
     switch (message[PARAM_PACKET_TYPE]) {
-      case PACKET_LOBBY:
+      case PACKET_LOBBY: {
+        const newUsernames: string[] = message[PARAM_USERNAMES];
         this.setState({
-          usernames: message[PARAM_USERNAMES],
+          usernames: newUsernames,
           icons: message[PARAM_ICON],
           botsEnabled: message.botsEnabled !== undefined ? message.botsEnabled : true,
           targetLobbySize: message.targetLobbySize !== undefined ? message.targetLobbySize : 5,
           page: PAGE.LOBBY,
         });
+        // Detect peer joins/leaves for voice chat
+        if (this.voiceControls) {
+          const prev = this.prevUsernames;
+          const curr = newUsernames.filter((n) => n !== this.state.name);
+          // New peers
+          curr.forEach((name) => {
+            if (!prev.includes(name)) {
+              this.voiceControls!.onPeerJoined(name);
+            }
+          });
+          // Left peers
+          prev.forEach((name) => {
+            if (!curr.includes(name)) {
+              this.voiceControls!.onPeerLeft(name);
+            }
+          });
+          this.prevUsernames = curr;
+        }
         if (message[PARAM_ICON][this.state.name] === defaultPortrait) {
           this.showChangeIconAlert();
         }
         this.updateChangeIconAlert();
         break;
+      }
 
       case PACKET_GAME_STATE:
         if (message !== this.state.gameState) {
@@ -475,6 +543,19 @@ class App extends Component<{}, AppState> {
           />,
           false
         );
+        break;
+      // ─── WebRTC signaling relay ───────────────────────────────────────────────
+      case "webrtc-offer":
+      case "webrtc-answer":
+      case "webrtc-ice":
+      case "webrtc-leave":
+        if (this.voiceControls) {
+          this.voiceControls.handleSignalingMessage(
+            message[PARAM_PACKET_TYPE],
+            message["from"],
+            message["payload"]
+          );
+        }
         break;
       case PACKET_PONG:
       default:
@@ -689,17 +770,8 @@ class App extends Component<{}, AppState> {
       <div className="App">
         <header className="App-header">BÍ MẬT HITLER - Nguyễn Minh Trí Edition</header>
         <br />
-        <div style={{ textAlign: "center" }}>
-          {/** TODO: Add reusable announcement component. 
-                    <div style={{backgroundColor: "#222222", width: "50vmin", margin: "0 auto", padding: "20px"}}>
-                        <p>
-                            Hello! Secret Hitler Online is currently undergoing some maintenance.
-                            Sorry for the interruption and please check back in in a few hours! -Shrimp
-                        </p>
-                        <p style={{fontStyle: "italic", fontSize: "calc(8px + 1vmin)"}}>(DATE TIME PM PT)</p>
-
-                    </div>
-                    */}
+        <div id="join-section" style={{ textAlign: "center" }}>
+          {/** TODO: Add reusable announcement component. */}
           <h2>THAM GIA VÁN CHƠI</h2>
           <MaxLengthTextField
             label={"Mã Phòng"}
@@ -742,6 +814,17 @@ class App extends Component<{}, AppState> {
           </button>
         </div>
         <br />
+        {/* ─── Danh sách phòng đang hoạt động ─── */}
+        <div style={{ maxWidth: "600px", margin: "0 auto", padding: "0 20px" }}>
+          <LobbyList
+            onSelectLobby={(code) => {
+              this.setState({ joinLobby: code });
+              // Scroll to join section
+              const el = document.getElementById("join-section");
+              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          />
+        </div>
         <LoginPageContent />
       </div>
     );
@@ -1009,6 +1092,13 @@ class App extends Component<{}, AppState> {
         <div style={{ textAlign: "center" }}>
           <div id="snackbar">{this.state.snackbarMessage}</div>
         </div>
+        {/* ─── Voice Chat ─── */}
+        <VoiceWrapper
+          onReady={(s, c) => { this.voiceControls = c; }}
+          sendSignal={this.sendVoiceSignal}
+          myName={this.state.name}
+          peers={this.state.usernames.filter((u) => u !== this.state.name)}
+        />
       </div>
     );
   }
@@ -1822,6 +1912,13 @@ class App extends Component<{}, AppState> {
         <div style={{ textAlign: "center" }}>
           <div id="snackbar">{this.state.snackbarMessage}</div>
         </div>
+        {/* ─── Voice Chat ─── */}
+        <VoiceWrapper
+          onReady={(s, c) => { this.voiceControls = c; }}
+          sendSignal={this.sendVoiceSignal}
+          myName={this.state.name}
+          peers={this.state.gameState.playerOrder.filter((u) => u !== this.state.name)}
+        />
       </div>
     );
   }

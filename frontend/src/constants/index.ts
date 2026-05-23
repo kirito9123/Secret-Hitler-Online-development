@@ -28,6 +28,7 @@ export const CHECK_LOGIN = "/check-login";
 export const NEW_LOBBY = "/new-lobby";
 export const WEBSOCKET = "/game";
 export const SERVER_PING = "/ping";
+export const GET_LOBBIES = "/lobbies";
 export const MAX_FAILED_CONNECTIONS = 5;
 export const LOBBY_CODE_LENGTH = 4;
 export const SERVER_TIMEOUT = 4000;
