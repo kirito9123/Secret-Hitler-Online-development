@@ -342,6 +342,17 @@ public class Lobby implements Serializable {
     }
 
     /**
+     * Returns the exact number of websockets currently connected to the Lobby.
+     * This differs from getUserCount() because disconnected players remain in activeUsernames
+     * for PLAYER_TIMEOUT_IN_SEC before being removed.
+     *
+     * @return the number of currently open websocket connections.
+     */
+    synchronized public int getConnectedUserCount() {
+        return userToUsername.size();
+    }
+
+    /**
      * Sends a message to every connected user with the current game state.
      * 
      * @effects a message containing a JSONObject representing the state of the

@@ -394,8 +394,8 @@ public class SecretHitlerServer {
         synchronized (codeToLobby) {
             for (Map.Entry<String, Lobby> entry : codeToLobby.entrySet()) {
                 Lobby lobby = entry.getValue();
-                int playerCount = lobby.getUserCount();
-                if (playerCount > 0) { // Only include lobbies that have players
+                int playerCount = lobby.getConnectedUserCount();
+                if (playerCount > 0) { // Only include lobbies that have currently connected players
                     JSONObject lobbyInfo = new JSONObject();
                     lobbyInfo.put("code", entry.getKey());
                     lobbyInfo.put("playerCount", playerCount);

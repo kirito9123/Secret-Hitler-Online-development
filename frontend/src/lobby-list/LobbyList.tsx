@@ -14,7 +14,7 @@ interface LobbyListProps {
   onSelectLobby: (code: string) => void;
 }
 
-const POLL_INTERVAL_MS = 5000;
+const POLL_INTERVAL_MS = 2000;
 
 const LobbyList: React.FC<LobbyListProps> = ({ onSelectLobby }) => {
   const [lobbies, setLobbies] = useState<LobbyInfo[]>([]);
